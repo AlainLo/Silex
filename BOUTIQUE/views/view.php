@@ -3,7 +3,7 @@
     <head>
         <title>Mon Site - </title>
 		<meta charset="UTF-8" />
-        <link rel="stylesheet" href="css/style.css"/>
+        <link rel="stylesheet" href="/css/style.css"/>
     </head>
     <body>    
         <header>
@@ -28,9 +28,9 @@
 
 					<div class="boutique-gauche">
 						<ul>
-							<li><a href="boutique.php">Tous les produits</a></li>	
+							<li><a href="/">Tous les produits</a></li>	
 							<?php for($i = 0; $i < count($categories) ; $i ++) : ?>
-								<li><a href="?cat=<?=  $categories[$i]['categorie'] ?>"><?=  $categories[$i]['categorie'] ?></a></li>	
+								<li><a href="/boutique/<?=  $categories[$i]['categorie'] ?>"><?=  $categories[$i]['categorie'] ?></a></li>	
 							<?php endfor; ?> 
 						</ul>
 					</div>
@@ -39,12 +39,12 @@
 						<?php foreach($produits as $pdt) :  ?>
 						<!-- Debut vignette produit -->
 						<div class="boutique-produit">
-							<h3><?= $pdt -> getTitre() ?></h3>
-							<a href="fiche_produit.php?id=<?= $pdt ->getId_produit() ?>"><img src="photo/<?= $pdt ->getPhoto() ?>" height="100"/></a>
+							<h3>"<?= $pdt ->getTitre() ?></h3>
+							<a href="/fiche_produit.php/<?= $pdt ->getId_produit() ?>"><img src="/photo/<?= $pdt ->getPhoto() ?>" height="100"/></a>
 							<p style="font-weight: bold; font-size: 20px;"><?= $pdt -> getPrix() ?>€</p>
 
 							<p style="height: 40px"><?= substr($pdt -> getDescription(), 0, 40) ?>...</p>
-							<a href="fiche_produit.php?id=<?= $pdt -> getId_produit() ?>" style="padding:5px 15px; background: red; color:white; text-align: center; border: 2px solid black; border-radius: 3px" >Voir la fiche</a>
+							<a href="/fiche_produit.php/<?= $pdt ->getId_produit() ?>" style="padding:5px 15px; background: red; color:white; text-align: center; border: 2px solid black; border-radius: 3px" >Voir la fiche</a>
 							<!-- href="fiche_produit.php?id=id_du_produit" -->
 						</div>
 		

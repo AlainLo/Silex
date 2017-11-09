@@ -3,28 +3,28 @@ SILEX
 -------------------------------------
 SOMMAIRE :
 INTRO : Qu'est ce que Silex ?
-ETAPE 0 : Base de notre app : site_mvc (procédural)
-ETAPE 1 : Installation de Silex
-ETAPE 2 : Démarrage et compréhension
-ETAPE 3 : Le routing avec Silex
-ETAPE 4 : Virtual Host
-ETAPE 5 : HTACCESS : on retire 'index.php' 
-ETAPE 6 : Démarrage de notre application BOUTIQUE
-ETAPE 7 : Utilisation de services Silex (Doctrine DBAL)
-ETAPE 8 : Utilisation des services Silex (Twig)
-ETAPE 9 : Utilisation des services Silex (Bootstrap)
-ETPAE 10 : Ajout des commentaires à nos produits (Injection de dépendance)
-ETAPE 11 : La classe DAO (Design pattern : comment transformer un tableau multi-dimensionnel 
+ÉTAPE 0 : Base de notre app : site_mvc (procédural)
+ÉTAPE 1 : Installation de Silex
+ÉTAPE 2 : Démarrage et compréhension
+ÉTAPE 3 : Le routing avec Silex
+ÉTAPE 4 : Virtual Host
+ÉTAPE 5 : HTACCESS : on retire 'index.php' 
+ÉTAPE 6 : Démarrage de notre application BOUTIQUE
+ÉTAPE 7 : Utilisation de services Silex (Doctrine DBAL)
+ÉTAPE 8 : Utilisation des services Silex (Twig)
+ÉTAPE 9 : Utilisation des services Silex (Bootstrap)
+ÉTAPE 10 : Ajout des commentaires à nos produits (Injection de dépendance)
+ÉTAPE 11 : La classe DAO (Design pattern : comment transformer un tableau multi-dimensionnel 
 	   composé d'arrays, en un tableau multidimensionnel composé d'objets)
-ETAPE 12 : Héritage TWIG
-ETAPE 13 : Gestion de la sécurité (Connexion)
-ETAPE 14 : Class MembreDAO et UserProviderInterface
-ETAPE 15 : Formulaire de Connexion
-ETAPE 16 : Formulaire d'Inscription
-ETAPE 17 : Formulaire de Contact
-ETAPE 18 : BACKOFFICE
-ETAPE 19 : Réorganisation en Controller
-ETAPE 20 : Préparation de la mise en prod
+ÉTAPE 12 : Héritage TWIG
+ÉTAPE 13 : Gestion de la sécurité (Connexion)
+ÉTAPE 14 : Class MembreDAO et UserProviderInterface
+ÉTAPE 15 : Formulaire de Connexion
+ÉTAPE 16 : Formulaire d'Inscription
+ÉTAPE 17 : Formulaire de Contact
+ÉTAPE 18 : BACKOFFICE
+ÉTAPE 19 : Réorganisation en Controller
+ÉTAPE 20 : Préparation de la mise en prod
 
 --------------------------------
 INTRO : Qu'est-ce que Silex ?
@@ -94,7 +94,7 @@ Composer est un outil de gestion des dépendances. il permet d'installer des serv
 -> Télécharger Composer
 -> Installer Composer (en précisant php.exe)
 
-2/ creation du dossier silex/BOUTIQUE/
+2/ création du dossier silex/BOUTIQUE/
 
 3/ Commande pour télécharger les composants de Silex :
 -> on se place dans le dossier BOUTIQUE/
@@ -134,7 +134,7 @@ Ce dossier constitue notre répertoire web. Cela signifie qu'il va contenir tout 
 -> Méthode run(): Lancement de l'application.
 
 ------------------------------
-ETAPE 3 : Le routing sur Silex
+ÉTAPE 3 : Le routing sur Silex
 ------------------------------
 
 Sommaire :
@@ -154,7 +154,7 @@ Sommaire :
 3/ La fonction Get
 A chaque nouvelle fonctionnalité, on va utiliser le fonction get de $app, qui nous crée une nouvelle route. En plus de get, il existe post() et match(). Nous les verrons plus tard.
 
-4/ ARguments :
+4/ Arguments :
 -> le premier argument est le nom de la route. Les paramètres contenus dans les URL sont alors déclarés entre {}
 -> le second argument function() est ce que l'on appelle une "closure" ou "fonction anonyme". Elle signifie que ce qui va suivre sera exécuté. Une fonction dans une fonction, finalement. Elle peut recevoir les paramètres dynamiques de notre URL. (ex: function($name)).
 
@@ -162,7 +162,7 @@ A chaque nouvelle fonctionnalité, on va utiliser le fonction get de $app, qui no
 -> la fonction escape() permet simplement d'afficher le paramètre contenu dans la route. La méthode escape() permet d'éviter les injections SQL dans votre URL.
 
 ----------------------
-ETAPE 4 : Virtual Host
+ÉTAPE 4 : Virtual Host
 ----------------------
 Sommaire :
 1/ Modifier le fichier vhost (apache)
@@ -349,3 +349,80 @@ Sommaire :
 	ARRAY : <?= $pdt['titre'] ?>
 	OBJET : <?= $pdt -> getTitre() ?>
 	TWIG : {( pdt.titre)}
+
+
+
+11/ modification du fichier index.php
+	-> on met en commentaire $app['debug'] = true;, puisque nous l'avons mis dans dev.php
+	-> On ajoute les require de app.php et dev.php avant le require de routes.php
+
+===> à ce stade, notre home doit afficher tous les produits et le menu des catégories. Cette étape nous a permis d'introduire une modélisation objet (propore à Silex : DAO, Routing...).
+===> Nous avons beraucoup travaillé la partie MODELS (DAO) et CONTROLLER (routes.php), à l'étape suivante, nous allons nous intéresser à la partie VIEWS avec TWIG
+
+
+-------------------------------------------------
+ÉTAPE 8 : UTILISATION DES SERVICES SILEX (Twig) :
+(Ajout de l'utilisation de la fonction render)
+-------------------------------------------------
+Sommaire :
+1/ Intro
+2/ Modification composer.Json
+3/ Mise à jour via Composer
+4/ Modification de app.php (enregistrement des nouveaux services)
+5/ Modification des fichiers view.php, produit.php en Twig
+6/ Fonction render() : modification des routes
+---------
+
+1/ Intro
+ -> Il existe plusieurs moteurs de template : Liquid, TPL, Smarty, Blade, Twig.
+ Pour Symfony et Silex, le moteur c'est TWIG.
+ -> De manière générale, un moteur de template permet de simplifier l'insertion de variables et de boucles PHP dans des blocs HTML (idée des formes contractées).
+ -> TWIG a l'avantage de proposer un système d'héritage. En d'autres termes, des morceaux d'HTML vont hériter d'autres morceaux d'HTML. Exemple : le formulaire d'inscription hérite du template général de la page.
+
+2/ Modification  du JSON : 
+	<code>
+	{
+        "require": {
+            "silex/silex": "~2.0",
+            "doctrine/dbal": "2.5",
+            "twig/twig": "~1.28"
+        },
+        "autoload": {
+            "psr-4" : {"BOUTIQUE\\": "src"}
+        }
+    }
+
+ 3/ Mise à jour via composer
+  <cmd>
+    composer update (dans le power shell)
+
+ 4/ Modification de app.php
+ 		-> enregistrement aux services Twig
+ 		-> L'enregistrement nécessite qu'on passe en argument le chemib de nos vues
+
+ 		<code>
+ 		$app ->register(new Silex\Provider\TwigServiceProvider(),
+ 		array(
+ 		'twig.path' -> __DIR__ . '/../views'
+ 		));
+
+ 5/ Modifications de nos vues :
+ 		-> view.php ==> index.html.twig
+ 		-> produit.php ===> produit.html.twig
+
+ 		<php>
+ 		<?php foreach($produits as $pdt) : ?>
+ 		$pdt -> getTitre()
+ 		<?php endforeach; ?>
+
+ 		<twig>
+ 		{# commentaire en twig #}
+ 		{% for pdt in produits %}
+ 			{{pdt.titre}}
+ 		{% endfor %}
+
+ 	6/ Modification des routes
+ 	-> ajout de la méthode render()
+
+ ===> à ce stade , notre home doit s'afficher. Test : www.boutique.dev.
+ ===> en savoir plus sur Twig : https://twig.symfony.com/

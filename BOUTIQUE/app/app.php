@@ -2,6 +2,11 @@
 
 // app/app.php
 
+$app ->register(new Silex\Provider\TwigServiceProvider(),
+ 		array(
+ 		'twig.path' => __DIR__ . '/../views'
+ 		));
+
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\ExceptionHandler;
 

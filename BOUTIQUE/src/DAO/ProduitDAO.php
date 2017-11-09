@@ -34,9 +34,37 @@ class produitDAO
 		return $produits; 
 	}
 
-	// toutes les autres requetes de l'entite Produit seront ici
+	// toutes les autres requêtes de l'entité Produit seront ici
 	// ---
-	// ---
+	public function findById($id){
+		// Fonction pour récupérer un produit dans la BDD :
+
+		$requete = "SELECT * FROM produit WHERE id_produit = ? ";
+		$resultat = $this -> getDb() ->
+		fetchAssoc($requete, array($id));
+		// $resultat : Contient toutes les infos du produit sous forme d'un array
+
+		$produit = $this -> buildProduit($resultat);
+		//on transforme l'array en objet de la classe produit (POPO) et on retourne cet objet
+
+		return $produit;
+	}
+
+	public function findAllbyCategorie($categorie){
+
+		$req = "SELECT * FROM produit WHERE categorie  = ?";
+		$resultat = $this -> getDb() -> fetchAll($req, array($categorie));
+		// $resultat = Array multidimensionnel composé d'array
+
+		$produit = array();
+		foreach($resultat as $value){
+			$id_produit = $value['id_produit'];
+			$produits[$id_produit] = $this -> buildProduit($value);
+		}
+		//$produits est maintenant un array multi composé d'autant d'objets que de produits récupérés par la requête
+		return $produits;
+	}
+
 
 	public function findAllCategories(){
 		$req = "SELECT DISTINCT categorie FROM produit";
@@ -45,7 +73,7 @@ class produitDAO
 		return $resultat;
 	}
 
-	protected function buildProduit(array $value){  //l'objectif de cette fonction est de transformer un array contenant toutes les infos d'un produit en un objet de la vlase Entity/Produit
+	protected function buildProduit(array $value){  //l'objectif de cette fonction est de transformer un array contenant toutes les infos d'un produit en un objet de la classe Entity/Produit
 		$produit = new produit; // notre POPO qu'on a créé avec ses Getter et ses Setter
 
 		$produit -> setId_Produit($value['id_produit']);
