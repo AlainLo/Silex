@@ -424,5 +424,130 @@ Sommaire :
  	6/ Modification des routes
  	-> ajout de la méthode render()
 
- ===> à ce stade , notre home doit s'afficher. Test : www.boutique.dev.
+ -> la méthode render est globalement commune à toutes les applications OBJET/MVC bien mododélisées. Elle va rendre une vue et embarquer tous les paramètres dynamiques nécessaires à cette vue.
+ -> Les paramètres embarqués le sont toujours sous forme d'un array.
+
+===> à ce stade , notre home doit s'afficher. Test : www.boutique.dev.
  ===> en savoir plus sur Twig : https://twig.symfony.com/
+
+---------------------------------------------------
+ÉTAPE 9 : UTILISATION DES SERVICES SILEX (Assets) :
+---------------------------------------------------
+Sommaire :
+1/ Modification de composer.json
+2/ mise à jours des services
+3/ Modifications de app.php
+4/ modification des vues (chemins css/js/image)
+5/ modification des vues (liens)
+
+1/ Modification de Composer.JSON
+
+<code>
+{
+        "require": {
+            "silex/silex": "~2.0",
+            "doctrine/dbal": "2.5",
+            "twig/twig": "~1.28",
+            "symfony/asset": "~2.8|3.0.*"
+        },
+        "autoload": {
+            "psr-4" : {"BOUTIQUE\\": "src"}
+        }
+    }    
+2/  <cmd>
+    composer update
+    composer require symfony/twig-bridge
+
+ 3/ Modification du fichier app.php
+   <code>
+	   $app -> register(new Silex\Provider\AssetServiceProvider(), array(
+	        'assets.version' => 'v1'
+	    ));
+
+  4/ Modification des chemins css/js/photo
+  -> On modifie tous les chemins des ressources de cette manière : 
+		  src="/photo{{ pdt.photo }}"
+		  href="../css/style.css"
+		  href="../bootstrap/js/bootstrap.min.js"
+
+		  src="{{ asset('photo/' ~ pdt.photo ) }}"
+		  href="{{ asset('/css/style.css' ) }}"
+		  href="{{ asset('bootstrap/js/bootstrap.min.js') }}"
+
+   5/ modifications des vues et des routes 
+	-> Liens : 
+		- href="/profil/"
+		- href="/boutique/{{ catagorie.categorie }}" 
+		-href="/produit/{{ pdt.id_produit }}"
+
+		- href="{{ path('profil') }}"
+		- href="{{ path('boutique', {'categorie' :categorie.categorie} ) }}"
+		- href="{{ path ('produit', {'id' : pdt.iod_produit} ) }}"
+
+	- chaque route va avoir un nom :
+			$app -> get('/profil/', function() use($app){
+				// traitement...
+				// traitement...
+			}) -> bind'('profil');
+
+			$app->get('/boutique/{categorie}'
+			)->bind('boutique'); 
+
+			$app->get('/produit/{id}'
+			)-> bind('produit');
+
+	-> Grâce au service assets de Silex, tous nos liens et chemeins vont être dynamisés et  absolus
+	-> Pour cela, on utilise asset() (ressources) et path() (lien). Concernant path(), Pour que cela fonctionne, il faut que toutes nos routes aient un nom.
+
+-------------------------
+ÉTAPE 12 : HÉRITAGE TWIG
+-------------------------
+
+Sommaire :
+1/ Créer le fichier layout.html.twig (structure de page) dans views/
+2 Modifier nos vues :
+
+1/ création du fichier layout.html.twig
+		-> on y met toute la structure d'une page
+		<!DOCTYPE html>
+		...
+		<section>
+		...
+
+		{% block content %}{% endblock %}
+		...
+		</section>
+		</html>
+2/Modifier les vues :
+	<code>
+	{% extends 'layout.html.twig %}
+	{% block content %}
+
+		****** contenu de la page ******
+
+	{% endblock %}
+
+--------------------------------
+ÉTAPE 17 : FORMULAIRE DE CONTACT
+--------------------------------
+Sommaire :
+1/ Créer la route
+2/ Faire le fichier contact.html.twig
+3/ Créer ContactType (la classe qui va nous construire les formulaires)
+	-> mise à jour de l'app (JSON + composer)
+	<code>
+	{
+	"require" {
+	"silex/silex": "~2.0",
+	"doctrine/dbal": "2.5",
+	"twig/twig": "~1.28",
+	"symfony/asset": "~2.8|3.0.*",
+	"symfony/twig-bridge": "^"
+	}
+	}
+	-> enregistrement service form
+	-> Form/Type/ContactType
+4/ Modifier la route (récupération du formulaire)
+5/ Modifier la vue contact.html.twig
+6/ Modifier la route (traitement de l'email)
+
