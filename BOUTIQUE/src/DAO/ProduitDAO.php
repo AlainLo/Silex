@@ -64,7 +64,27 @@ class produitDAO
 		//$produits est maintenant un array multi composé d'autant d'objets que de produits récupérés par la requête
 		return $produits;
 	}
+	public function save(Produit $produit){
 
+		$produitData = array(
+			'id_produit' => $produit -> getid_produit(),
+			'reference' => $produit -> getReference(),
+			'categorie' => $produit -> getCategorie(),
+			'titre' => $produit -> getTitre(),
+			'description' => $produit -> getDescription(),
+			'public' => $produit -> getPublic(),
+			'couleur' => $produit -> getCouleur(),
+			'taille' => $produit -> getTaille(),
+			'stock' => $produit -> getStock(),
+			'prix' => $produit -> getPrix(),
+			'photo' => $produit -> getPhoto() -> originalName
+
+	};
+
+	if(£produit -> getId_produit()){
+		// Update
+		$this -> getDb - > update 
+	}
 
 	public function findAllCategories(){
 		$req = "SELECT DISTINCT categorie FROM produit";

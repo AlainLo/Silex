@@ -531,23 +531,117 @@ Sommaire :
 ÉTAPE 17 : FORMULAIRE DE CONTACT
 --------------------------------
 Sommaire :
-1/ Créer la route
-2/ Faire le fichier contact.html.twig
-3/ Créer ContactType (la classe qui va nous construire les formulaires)
-	-> mise à jour de l'app (JSON + composer)
-	<code>
-	{
-	"require" {
-	"silex/silex": "~2.0",
-	"doctrine/dbal": "2.5",
-	"twig/twig": "~1.28",
-	"symfony/asset": "~2.8|3.0.*",
-	"symfony/twig-bridge": "^"
-	}
-	}
-	-> enregistrement service form
-	-> Form/Type/ContactType
-4/ Modifier la route (récupération du formulaire)
-5/ Modifier la vue contact.html.twig
-6/ Modifier la route (traitement de l'email)
+1/ Créer la route (render)
+-> Création de la route /contact/.
+-> Lorsqu'on interagit avec un formulaire en silex, et si on utilise toutes les fonctionnalités de silex, il faut utiliser le composant Request qui gère la soumission du formulaire. La fonction anonyme function() attend donc un objet de la classe Request.
+-> le composant Request de HttpFoundation doit être USE en haut du fichier: 
+<code>
+use Symfony\Component\HttpFoundation\Request;
+-> cette route doit traiter des indos en get (nom de la route) et en post (info du formulaire), la fonction est donc match(post + get) et non pas get().
 
+2/ Faire le fichier contact.html.twig
+	-> On ne crée pas directement le forùmulmaire en HTML , on prépare simplement la page, car le formulaire sera créé à l'étape suivante, via la classe abstraite AbstractType qui permet de créer des classes gérant la construction de nos formulaires.
+	-> cette démarche est nouvelle et sera trés pratique par la suite.
+
+3/ Créer ContactType (la classe qui va nous construire le formulaire)
+	-> On crée un fichier ContactType, dans le sous-dossier Type dans le dossier Form
+	-> Cette classe va nous permettre de définir ce qu'est notre formulaire de contact. Elle hérite de la classe Abstraite AbstractType.
+	-> La méthode formBuilder va nous permettre de construire un formulaire et va attendre en argument un objet de l'interface FormBuilderInterface.
+	-> La méthode add de notre builder va nous permettre de construire chaque champ un par un avec des options possibles pour chacun : les contraintes, les classes, les attributs, etc...
+	-> pourb que l'ensemble fonctionne, nous avons besoin de USE beaucoup de composants :
+	<code>
+	use Symfony\Component\Form\AbstractType;
+	use Symfony\Component\Form\FormBuilderinterface;
+	use Symfony\Component\Form\Extension\Core\Type\TextType;
+	use Symfony\Component\Form\Extension\Core\Type\EmailType;
+	use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+	use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+	use Symfony\Component\Validator\Constraints as Assert;
+	use Symfony\Component\Validator\Constraints\NotBlank;
+
+4/ Enregistrement de nouveau services (JSON + Composer + app.php)
+   <code>
+    "require": {
+        "silex/silex": "~2.0",
+        "doctrine/dbal": "2.5",
+        "twig/twig": "~1.28",
+        "symfony/asset": "~2.8|3.0.*",
+        "symfony/twig-bridge": "^3.3",
+        "symfony/form": "~2.8|3.0.*",
+        "symfony/translation": "~2.8|3.0.*",
+   "symfony/config": "~2.8|3.0.*",
+   "symfony/validator": "^3.2"
+    },
+    "autoload": {
+        "psr-4" : {"BOUTIQUE\\": "src"}
+    }
+}
+<cmd>
+composer update
+
+// enregistrement des services form, translation, validator :
+<code>
+$app -> register(new Silex\Provider\LocaleServiceProvider());
+$app -> register (new Silex\Provoider\TranslationService Provider());
+$app -> register(new Silex\Provider\ValidatorServiceProvider());
+
+5/ Modifier la route (récupération du formulaire)
+	-> la fonctyion create() de $appp['formfactory'] va constrire et récupérer notre formulaire, en leui précisant le type de fpormulaire à récupérer.
+	-> HandleRequest ($request) de notre formulaire va gérer les infos récupérées.
+	-> crateView() de notre formulaire va créer la partie visuelle du formulaire, et c'est cela que nous allons envoyer à la vue.
+
+6/ Modifier la vue contact.html.twig
+	-> twig simplifie énormément la gestion de l'affichage diu formulaire, l'affichage des données dans le formulaitre et l'affichage des messages d'erreurrs:
+	<code>
+	{% if contactForm%}
+		{{ form start(contact Form) }}
+		<label> Prénom : </label>
+		{{ form_errors(contactForm.prenom) }}
+		{{ form_widget(contactForm.prenom) }}
+		...
+		...
+	{{ form_end(contactForm) }}
+{% endif %}
+
+7/ Modifier la route (traitement de l'email)
+-> notre contactForm contient des méthodes isSubmitted() et isValid() qui nous permettent de savoir si le formulaire est activé et validé.
+-> Ce système remplace un nombre incalculable de lignes PHP en mode procédural :) :)
+
+====> à ce stade, le formulaire wwww.boutique.dev/contact doit s'afficher, et nous retourner un print_r() avec toutes les infos en post
+====> il suffirait d'ajouter des traitements dans notre route pour que le fonctionnement soit complet.
+
+
+--------------------------------
+ÉTAPE 18 : BACKOFFICE
+--------------------------------
+
+Sommaire : 
+1/ Créer un Controller BackOfficeController
+2/ Créer la route get('backoffice/produit') dont le nom est bo_produit
+3/ Créer la fonction produitAction dans BackOfficeController et gérer toute la fonction
+4/ Créer la vue backoffice-produit.html.twig qui affiche tous les produits sous forme d'un tableau
+5/ Créer la route match('backoffice/produit/{id}/add') dont le nom est bo_produit_add
+6/ Créer la fonction addProduitAction() et gérer l'affichage de la page d'ajout 
+è/ Créer ProduitType pour créer le formulaire d'ajout de produit
+8/ Modifier la fonction addProduitAction() pour qu'elle affiche le formulaire
+
+---------------------------------------
+ÉTAPE 19 : RÉORGANISATION EN CONTROLLER
+---------------------------------------
+
+1/ Création de trois controllers : BaseController, ProduitController et MembreController
+	-> dans le dossier src, on a créé Controller /
+	-> Controller/BaseController.php
+	-> Controller/ProduitController.php
+	-> Controller/MembreController.php
+-> dans chque controller, on a autant d'actions (fonctions) que d'afficgaes prévus. Un affichage == une fonction.
+
+2/ On doit créer des fonctions pour chaque controller en fonction des affichages et des actions qu'ils doivent gérer.
+	-> exemple : ProduitController -> ProduitAction($id)
+	-> exemple : ProduitController -> boutiqueAction($categorie)
+
+3/ Les routes ne contiennent plus de fonctions anonymes mais elles appellent simplement la fonction qu'il va falloir exécuter.
+
+4/ Tous les traitements qui étaient présents dans les routes, sont maintenant encapsulés dans les fonctions des Controller.
+
+---------
